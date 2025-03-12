@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        #chat {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            height: 400px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+        #chat .message {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        #chat .message.user {
+            background-color: #d1e7dd;
+            text-align: right;
+        }
+        #chat .message.bot {
+            background-color: #f8d7da;
+        }
+        #input-form {
+            display: flex;
+            margin-top: 10px;
+        }
+        #input-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #input-form button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Healthcare Assistant</h1>
+        <div id="chat">
+            <!-- Chat messages will be appended here -->
+        </div>
+        <form id="input-form">
+            <input type="text" id="query" placeholder="Type your question here...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('input-form');
+        const chat = document.getElementById('chat');
+        const queryInput = document.getElementById('query');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const query = queryInput.value;
+            if (query.trim() === '') return;
+
+            // Append user message
+            chat.innerHTML += `<div class="message user">${query}</div>`;
+            queryInput.value = '';
+
+            // Fetch response from server
+            const response = await fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ query })
+            });
+
+            const result = await response.json();
+            
+            // Append bot response
+            chat.innerHTML += `<div class="message bot">${result.response}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        });
+    </script>
+</body>
+</html>
